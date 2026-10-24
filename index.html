@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NETGUARD — Cyber Security Mission</title>
+<style>
+:root{
+  --bg:#07111f; --panel:#0d1b2e; --panel2:#11243b; --text:#edf6ff;
+  --muted:#9db0c7; --primary:#39d0ff; --secondary:#7c5cff; --success:#35d39a;
+  --warning:#ffc857; --danger:#ff647c; --border:rgba(255,255,255,.10);
+  --shadow:0 18px 50px rgba(0,0,0,.28); --radius:22px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 10% 10%,rgba(57,208,255,.12),transparent 28%),
+    radial-gradient(circle at 90% 20%,rgba(124,92,255,.14),transparent 30%),
+    linear-gradient(145deg,#050c16,#07111f 50%,#09182a);
+  color:var(--text); min-height:100vh;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh}
+.topbar{
+  position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  padding:14px 5vw;background:rgba(5,12,22,.82);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border)
+}
+.brand{display:flex;align-items:center;gap:11px;font-weight:900;letter-spacing:.5px}
+.brand-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--secondary));font-size:21px}
+.progress-wrap{display:flex;align-items:center;gap:12px;min-width:220px}
+.progress{height:8px;background:#18283b;border-radius:99px;overflow:hidden;flex:1}
+.progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:.35s}
+.progress-label{font-size:12px;color:var(--muted);white-space:nowrap}
+main{width:min(1120px,92vw);margin:auto;padding:34px 0 80px}
+.screen{display:none;animation:fade .35s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hero{min-height:72vh;display:grid;place-items:center;text-align:center}
+.hero-card{max-width:850px}
+.shield{
+  width:110px;height:110px;margin:0 auto 22px;border-radius:34px;display:grid;place-items:center;
+  background:linear-gradient(145deg,rgba(57,208,255,.18),rgba(124,92,255,.22));
+  border:1px solid rgba(57,208,255,.28);box-shadow:0 0 80px rgba(57,208,255,.12);font-size:55px
+}
+h1{font-size:clamp(38px,7vw,76px);line-height:.95;margin:0 0 18px}
+h2{font-size:clamp(26px,4vw,42px);margin:0 0 12px}
+h3{margin:0 0 8px}
+.gradient{background:linear-gradient(90deg,var(--primary),#bca8ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.subtitle{font-size:clamp(16px,2vw,20px);color:var(--muted);line-height:1.7}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;padding:8px 13px;border:1px solid var(--border);border-radius:99px;color:var(--primary);background:rgba(57,208,255,.06);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:25px}
+.center{justify-content:center}
+.btn{
+  border:0;border-radius:14px;padding:13px 18px;color:#04101b;font-weight:850;
+  background:linear-gradient(135deg,var(--primary),#7be6ff);box-shadow:0 8px 25px rgba(57,208,255,.18);
+  transition:.2s
+}
+.btn:hover{transform:translateY(-2px)}
+.btn.secondary{background:#162a42;color:var(--text);border:1px solid var(--border);box-shadow:none}
+.btn.success{background:linear-gradient(135deg,#35d39a,#8af1ca)}
+.btn.danger{background:linear-gradient(135deg,#ff647c,#ff9aac)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{
+  background:linear-gradient(145deg,rgba(17,36,59,.94),rgba(9,24,41,.94));
+  border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)
+}
+.menu-card{min-height:150px;cursor:pointer;transition:.22s}
+.menu-card:hover{transform:translateY(-4px);border-color:rgba(57,208,255,.35)}
+.icon{font-size:32px;margin-bottom:14px}
+.muted{color:var(--muted);line-height:1.65}
+.small{font-size:13px;color:var(--muted)}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px}
+.back{margin-bottom:22px}
+.material-nav{display:flex;gap:8px;overflow:auto;padding-bottom:10px;margin-bottom:20px}
+.pill{
+  flex:0 0 auto;border:1px solid var(--border);background:#0d1b2e;color:var(--muted);
+  border-radius:99px;padding:9px 13px;font-size:13px;cursor:pointer
+}
+.pill.active{background:rgba(57,208,255,.12);color:var(--primary);border-color:rgba(57,208,255,.35)}
+.material{display:none}
+.material.active{display:block;animation:fade .25s ease}
+.visual{
+  min-height:210px;border-radius:18px;background:
+  radial-gradient(circle at 50% 45%,rgba(57,208,255,.12),transparent 35%),#081524;
+  border:1px solid var(--border);display:grid;place-items:center;padding:24px;margin:20px 0
+}
+.flow{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.node{padding:18px 22px;border-radius:17px;background:#112a44;border:1px solid rgba(57,208,255,.2);text-align:center;min-width:130px}
+.arrow{font-size:25px;color:var(--primary)}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.good,.bad{border-radius:16px;padding:16px;border:1px solid var(--border)}
+.good{background:rgba(53,211,154,.07)} .bad{background:rgba(255,100,124,.07)}
+.code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;padding:12px;border-radius:10px;background:#050b13;margin-top:8px;word-break:break-word}
+.mission{
+  margin-top:25px;padding:22px;border-radius:20px;border:1px solid rgba(57,208,255,.2);
+  background:linear-gradient(145deg,rgba(57,208,255,.08),rgba(124,92,255,.06))
+}
+.option{
+  width:100%;text-align:left;padding:14px;margin:9px 0;border-radius:13px;border:1px solid var(--border);
+  background:#0b1a2c;color:var(--text);transition:.18s
+}
+.option:hover{border-color:rgba(57,208,255,.4)}
+.option.selected{border-color:var(--primary);background:rgba(57,208,255,.1)}
+.option.correct{border-color:var(--success);background:rgba(53,211,154,.12)}
+.option.wrong{border-color:var(--danger);background:rgba(255,100,124,.10)}
+.feedback{margin-top:12px;padding:12px;border-radius:12px;display:none}
+.feedback.show{display:block}
+.form-group{margin:14px 0}
+label{display:block;margin-bottom:7px;font-weight:750;font-size:14px}
+input,textarea,select{
+  width:100%;padding:13px 14px;border-radius:13px;border:1px solid var(--border);
+  background:#071522;color:var(--text);outline:none
+}
+input:focus,textarea:focus,select:focus{border-color:var(--primary)}
+textarea{min-height:95px;resize:vertical}
+.locked{opacity:.6;pointer-events:none}
+.status{
+  display:inline-flex;align-items:center;gap:7px;border-radius:99px;padding:7px 11px;font-size:12px;font-weight:800;
+  background:rgba(53,211,154,.08);color:var(--success);border:1px solid rgba(53,211,154,.2)
+}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+.stat{padding:18px;border-radius:17px;background:#0c1b2d;border:1px solid var(--border)}
+.stat strong{display:block;font-size:27px;margin-top:5px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left}
+th{color:var(--muted);font-size:12px;text-transform:uppercase}
+.badge{display:inline-block;padding:5px 9px;border-radius:99px;background:#162a42;color:var(--muted);font-size:12px}
+.notice{padding:15px;border-left:3px solid var(--primary);background:rgba(57,208,255,.06);border-radius:10px;color:#ccecff;line-height:1.6}
+footer{text-align:center;color:#6f849b;font-size:12px;margin-top:40px}
+@media(max-width:760px){
+  .topbar{padding:12px 4vw}.progress-wrap{min-width:120px}
+  .grid-2,.grid-3,.stat-grid{grid-template-columns:1fr}
+  .compare{grid-template-columns:1fr}
+  main{width:92vw;padding-top:25px}
+  .section-head{align-items:flex-start;flex-direction:column}
+}
+
+.brand-icon,.shield{position:relative;cursor:pointer;user-select:none}
+.brand-icon{transition:transform .25s,box-shadow .25s}
+.brand-icon:hover{transform:translateY(-2px) scale(1.06);box-shadow:0 0 24px rgba(57,208,255,.35)}
+.brand-icon.scan,.shield.scan{animation:shieldPulse .9s ease}
+@keyframes shieldPulse{0%{transform:scale(1);filter:none}35%{transform:scale(1.08) rotate(-2deg);filter:drop-shadow(0 0 12px rgba(57,208,255,.75))}70%{transform:scale(.98) rotate(2deg)}100%{transform:scale(1);filter:none}}
+.shield::after{content:"";position:absolute;inset:12px;border:2px solid rgba(57,208,255,0);border-radius:25px;pointer-events:none}
+.shield.scan::after{animation:scanRing .9s ease}
+@keyframes scanRing{0%{transform:scale(.7);opacity:0;border-color:rgba(57,208,255,.0)}35%{opacity:1;border-color:rgba(57,208,255,.75)}100%{transform:scale(1.35);opacity:0;border-color:rgba(124,92,255,.0)}}
+.secure-burst{position:absolute;inset:-8px;border-radius:40px;pointer-events:none}
+.secure-burst::before,.secure-burst::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:var(--primary);transform:translate(-50%,-50%);opacity:0}
+.shield.scan .secure-burst::before{animation:burst1 .9s ease}
+.shield.scan .secure-burst::after{animation:burst2 .9s ease}
+@keyframes burst1{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}40%{opacity:1}100%{opacity:0;transform:translate(-210%,-170%) scale(.8)}}
+@keyframes burst2{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}40%{opacity:1}100%{opacity:0;transform:translate(130%,100%) scale(.8)}}
+.material-detail{font-size:16px;line-height:1.82;color:#dcecff;margin-top:16px}
+.material-detail p{margin:0 0 14px}
+.material-detail ul{margin:8px 0 16px;padding-left:22px;color:#c7d9eb}
+.material-detail li{margin:7px 0}
+.context-box{padding:16px 18px;border-radius:16px;background:rgba(124,92,255,.07);border:1px solid rgba(124,92,255,.18);margin-top:16px}
+.identity-active{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.member-chip{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;background:rgba(53,211,154,.08);color:var(--success);border:1px solid rgba(53,211,154,.2);font-size:12px;font-weight:800}
+.case-card{border:1px solid rgba(57,208,255,.18);background:linear-gradient(145deg,rgba(57,208,255,.05),rgba(124,92,255,.04));border-radius:20px;padding:22px;margin-top:16px}
+.case-card h3{color:#eaf7ff}
+.case-meta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+.case-meta span{padding:7px 10px;border-radius:999px;background:#0c2035;border:1px solid var(--border);font-size:12px;color:var(--muted)}
+.readonly-box{background:#0b1929;border:1px dashed var(--border);border-radius:14px;padding:14px;color:#b9cce0}
+
+
+.material-tab{border:1px solid var(--border);background:var(--panel);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;margin:4px;font-weight:700}
+.material-tab.active{box-shadow:0 0 0 2px var(--accent) inset;transform:translateY(-1px)}
+.mission-box{margin-top:18px;padding:22px;border:1px solid var(--border);border-radius:18px;background:linear-gradient(135deg,rgba(80,160,255,.08),rgba(80,220,180,.06))}
+.material-actions{display:flex;justify-content:space-between;gap:10px;margin:18px 0}
+.member-list{display:flex;flex-wrap:wrap;gap:8px}.member-chip{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;border-radius:999px;background:rgba(53,211,154,.08);border:1px solid rgba(53,211,154,.25);color:#c8ffe9;font-size:13px;font-weight:750}.online-refresh{margin-top:10px}</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="brand-icon" onclick="activateShield(this)" title="Klik untuk menjalankan security scan">🛡️</div><span>NETGUARD</span></div>
+  <div class="progress-wrap">
+    <div class="progress"><span id="globalProgress"></span></div>
+    <div class="progress-label" id="progressLabel">0%</div>
+  </div>
+</header>
+
+<main>
+<!-- SPLASH -->
+<section id="splash" class="screen active">
+  <div class="hero">
+    <div class="hero-card">
+      <div class="shield" onclick="activateShield(this)" role="button" tabindex="0" title="Klik untuk menjalankan security scan"><span>🛡️</span><span class="secure-burst"></span></div>
+      <div class="eyebrow">INFORMATIKA • KELAS X</div>
+      <h1><span class="gradient">NETGUARD</span></h1>
+      <h2>Cyber Security Mission</h2>
+      <p class="subtitle">Amankan jaringanmu, lindungi datamu.<br>Pelajari prinsip keamanan jaringan, temukan masalahnya, lalu tentukan solusi yang tepat.</p>
+      <div class="actions center"><button class="btn" onclick="go('home')">Mulai Misi →</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOME -->
+<section id="home" class="screen">
+  <div class="section-head">
+    <div><div class="eyebrow">Dashboard</div><h2>Selamat datang, <span class="gradient" id="homeName">Penjaga Jaringan</span>!</h2><p class="muted">Selesaikan materi sebelum istirahat, lalu lanjutkan investigasi melalui LKPD kelompok.</p></div>
+  </div>
+  <div class="card" style="margin-bottom:18px" id="homeIdentityCard">
+    <div class="identity-active">
+      <div><div class="small">IDENTITAS AKTIF</div><h3 id="activeIdentity" style="margin-top:5px">Belum masuk</h3><p class="muted" id="activeIdentityHint">Masukkan nama sebelum aktivitas agar progres tersimpan atas nama kamu.</p></div>
+      <div class="actions">
+        <button class="btn secondary" onclick="openIdentity()" id="identityAction">Masukkan Identitas</button>
+        <button class="btn ghost" type="button" onclick="restartFromBeginning()">↻ Ulangi dari Awal</button>
+      </div>
+    </div>
+  </div>
+  <div class="grid grid-3">
+    <div class="card menu-card" onclick="go('materi')"><div class="icon">📚</div><h3>Materi</h3><p class="muted">Pelajari prinsip, masalah, dan pentingnya keamanan jaringan.</p></div>
+    <div class="card menu-card" role="button" tabindex="0" onclick="go('lkpd')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('lkpd')}"><div class="icon">📋</div><h3>LKPD</h3><p class="muted">Satu kelompok menganalisis satu kasus berbeda. Gunakan satu HP untuk menulis hasil diskusi bersama.</p><button type="button" class="btn secondary" style="margin-top:10px" onclick="event.stopPropagation();go('lkpd')">Buka LKPD →</button></div>
+    <div class="card menu-card" onclick="go('refleksi')"><div class="icon">💭</div><h3>Refleksi</h3><p class="muted">Tuliskan perubahan pemahaman dan kebiasaan keamananmu.</p></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <h3>🛰️ Status Misi</h3>
+    <div class="stat-grid">
+      <div class="stat"><span class="small">Mission Check</span><strong id="missionCount">0/8</strong></div>
+      <div class="stat"><span class="small">Aktivitas Dibahas</span><strong id="activityScore">0%</strong></div>
+      <div class="stat"><span class="small">LKPD</span><strong id="lkpdStatus">Belum</strong></div>
+      <div class="stat"><span class="small">Refleksi</span><strong id="reflectionStatus">Belum</strong></div>
+    </div>
+    <div class="notice">💡 <b>Catatan:</b> Pertanyaan pemantik digunakan untuk rekap aktivitas dan diskusi kelas, bukan sebagai nilai ujian. Fokus utama setelah istirahat adalah analisis kasus melalui LKPD.</div>
+  </div>
+</section>
+
+<!-- MATERI -->
+<section id="materi" class="screen">
+  <button class="btn secondary back" onclick="go('home')">← Kembali</button>
+  <div class="section-head">
+    <div><div class="eyebrow">Security Academy</div><h2>Materi Keamanan Jaringan</h2><p class="muted">Baca setiap bagian, perhatikan contoh, lalu jawab satu Mission Check.</p></div>
+  </div>
+
+  <div class="material-nav" id="materialNav"></div>
+  <div id="materialsContainer"></div>
+</section>
+
+<!-- LKPD -->
+<section id="lkpd" class="screen">
+  <button class="btn secondary back" onclick="go('home')">← Kembali</button>
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">LKPD Kelompok • PBL + CRT</div>
+      <h2>🛡️ LKPD Analisis Kasus Keamanan Jaringan</h2>
+      <p class="muted">Satu kelompok mengerjakan satu kasus secara bersama-sama. Cukup satu HP yang digunakan untuk mengetik hasil diskusi kelompok.</p>
+    </div>
+  </div>
+
+  <div class="card" id="identityCard">
+    <div class="status">👥 Langkah 1 — Identitas Kelompok</div>
+    <p class="muted">Setiap kelompok terdiri dari 4 orang. Pilih nomor kelompok untuk mendapatkan kasus yang berbeda. Salah satu anggota cukup menjadi pengetik, sedangkan seluruh anggota tetap berdiskusi.</p>
+    <div class="grid grid-2">
+      <div class="form-group">
+        <label>Kelompok</label>
+        <select id="groupCode">
+          <option value="">Pilih kelompok...</option>
+          <option value="KEL1">Kelompok 1</option><option value="KEL2">Kelompok 2</option><option value="KEL3">Kelompok 3</option>
+          <option value="KEL4">Kelompok 4</option><option value="KEL5">Kelompok 5</option><option value="KEL6">Kelompok 6</option>
+          <option value="KEL7">Kelompok 7</option><option value="KEL8">Kelompok 8</option><option value="KEL9">Kelompok 9</option>
+          <option value="KEL10">Kelompok 10</option><option value="KEL11">Kelompok 11</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nama pengisi / pengetik</label>
+        <input id="studentName" placeholder="Nama anggota yang mengisi di HP">
+      </div>
+    </div>
+    <h3 style="margin-top:10px">👤👤👤👤 Empat Anggota Kelompok</h3>
+    <div class="grid grid-2">
+      <div class="form-group"><label>Anggota 1</label><input id="member1" placeholder="Nama lengkap"></div>
+      <div class="form-group"><label>Anggota 2</label><input id="member2" placeholder="Nama lengkap"></div>
+      <div class="form-group"><label>Anggota 3</label><input id="member3" placeholder="Nama lengkap"></div>
+      <div class="form-group"><label>Anggota 4</label><input id="member4" placeholder="Nama lengkap"></div>
+    </div>
+    <button class="btn success" onclick="saveIdentity()">🚀 Buka LKPD Kelompok</button>
+  </div>
+
+  <div class="card" id="caseCard" style="display:none;margin-top:18px">
+    <div class="status">🔎 Langkah 2 — Baca dan Pahami Kasus</div>
+    <div class="case-card">
+      <div class="eyebrow" id="caseLabel">Kasus Kelompok</div>
+      <h3 id="caseTitle" style="margin-top:12px"></h3>
+      <div class="case-meta" id="caseMeta"></div>
+      <div id="caseText"></div>
+      <div class="context-box" id="caseFocus" style="margin-top:16px"></div>
+    </div>
+    <div class="notice" style="margin-top:16px">
+      💬 <b>Kerjakan bersama.</b> Baca kasus, saling bertanya, ceritakan pengalaman yang mirip jika ada, lalu sepakati jawaban kelompok. Satu orang boleh mengetik, tetapi jawaban merupakan hasil diskusi 4 anggota.
+    </div>
+  </div>
+
+  <div class="card" id="analysisCard" style="display:none;margin-top:18px">
+    <div class="status">🧠 Langkah 3 — Analisis Kelompok</div>
+    <p class="muted">Tidak perlu mencari satu jawaban yang sama persis dengan kelompok lain. Gunakan bukti dari kasus dan kondisi lingkungan yang diceritakan.</p>
+
+    <div class="form-group">
+      <label>1. 🔎 Apa masalah keamanan jaringan yang terjadi?</label>
+      <textarea id="gProblem" placeholder="Tuliskan masalah utama yang ditemukan kelompok..." rows="4"></textarea>
+    </div>
+    <div class="form-group">
+      <label>2. 🔍 Apa penyebab masalah tersebut?</label>
+      <textarea id="gCause" placeholder="Jelaskan penyebab berdasarkan informasi dalam kasus..." rows="4"></textarea>
+    </div>
+    <div class="form-group">
+      <label>3. 💥 Apa dampaknya jika masalah dibiarkan?</label>
+      <textarea id="gImpact" placeholder="Jelaskan dampak terhadap data, perangkat, privasi, atau konektivitas..." rows="4"></textarea>
+    </div>
+    <div class="form-group">
+      <label>4. 🛠️ Solusi keamanan jaringan apa yang kelompok kalian usulkan?</label>
+      <textarea id="gSolution" placeholder="Tuliskan solusi yang realistis untuk kondisi pada kasus..." rows="4"></textarea>
+    </div>
+    <div class="form-group">
+      <label>5. 🔐 Konsep keamanan jaringan apa yang kalian gunakan?</label>
+      <textarea id="gConcept" placeholder="Misalnya autentikasi, password kuat, enkripsi, pembaruan perangkat, atau perlindungan akses..." rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label>6. 🌱 Hubungkan dengan kehidupan dan lingkungan kalian (CRT)</label>
+      <textarea id="gCRT" placeholder="Apakah situasi seperti ini pernah kalian temui di rumah, sekolah, lingkungan sekitar, atau saat menggunakan internet bersama? Jelaskan kaitannya..." rows="4"></textarea>
+    </div>
+    <div class="form-group">
+      <label>7. 💡 Mengapa solusi tersebut sesuai dengan kondisi pada kasus?</label>
+      <textarea id="gReason" placeholder="Jelaskan alasan kelompok memilih solusi tersebut dan kebiasaan/nilai yang perlu diterapkan..." rows="4"></textarea>
+    </div>
+    <div class="form-group">
+      <label>8. 📝 Kesimpulan kelompok</label>
+      <textarea id="gConclusion" placeholder="Tuliskan kesimpulan singkat hasil diskusi kelompok..." rows="4"></textarea>
+    </div>
+
+    <div class="actions" style="margin-top:16px;flex-wrap:wrap">
+      <button class="btn success" onclick="saveGroupLKPD()">💾 Simpan LKPD Kelompok</button>
+      <button class="btn" id="pdfBtn" onclick="generateLKPDF()" disabled>📄 Kumpulkan sebagai PDF</button>
+    </div>
+    <div id="groupSaved" class="notice" style="display:none;margin-top:15px">✅ LKPD kelompok sudah tersimpan. Silakan buat PDF untuk dikumpulkan.</div>
+  </div>
+
+  <div class="card" id="summaryCard" style="display:none;margin-top:18px">
+    <div class="status">📄 Langkah 4 — Pengumpulan</div>
+    <h3>LKPD siap dikumpulkan</h3>
+    <p class="muted">Satu kelompok menghasilkan satu file PDF. Pastikan nama anggota, hasil analisis, dan kesimpulan sudah benar sebelum mengunduh.</p>
+    <button class="btn success" onclick="generateLKPDF()">📄 Buat PDF LKPD Kelompok</button>
+  </div>
+</section>
+
+<!-- REFLEKSI -->
+<section id="refleksi" class="screen">
+  <button class="btn secondary back" onclick="go('home')">← Kembali</button>
+  <div class="section-head"><div><div class="eyebrow">Deep Learning</div><h2>Refleksi Penjaga Jaringan</h2><p class="muted">Hubungkan apa yang kamu pelajari dengan kebiasaan sehari-hari.</p></div></div>
+  <div class="card">
+    <div class="form-group"><label>Sebelum belajar, saya berpikir bahwa keamanan jaringan...</label><textarea id="rBefore"></textarea></div>
+    <div class="form-group"><label>Setelah belajar, saya memahami bahwa...</label><textarea id="rAfter"></textarea></div>
+    <div class="form-group"><label>Satu kebiasaan keamanan jaringan yang akan saya terapkan adalah...</label><textarea id="rAction"></textarea></div>
+    <div class="form-group"><label>Konteks yang paling dekat dengan kehidupan saya</label>
+      <select id="rContext"><option value="">Pilih...</option><option>Rumah</option><option>Sekolah</option><option>Tempat umum</option><option>Semua konteks</option></select>
+    </div>
+    <button class="btn success" onclick="saveReflection()">💾 Simpan Refleksi</button>
+    <div id="reflectionSaved" class="notice" style="display:none;margin-top:15px">✅ Refleksi tersimpan.</div>
+  </div>
+</section>
+
+<footer>NETGUARD • Media Pembelajaran Informatika Kelas X • PBL + CRT + Pembelajaran Mendalam</footer>
+</main>
+</div>
+
+<script>
+const materials = [
+{
+ id:"m1", title:"10.5.8 • Mengapa Keamanan Jaringan Penting?", icon:"🛡️",
+ content:`<div class="card">
+  <h2>Mengapa keamanan jaringan penting?</h2>
+  <div class="material-detail">
+   <p>Keamanan jaringan adalah upaya menjaga jaringan, perangkat, akun, dan data agar tidak mudah diakses, digunakan, diubah, atau diganggu oleh pihak yang tidak berhak. Jaringan bukan hanya sesuatu yang dipikirkan oleh teknisi. Saat siswa menggunakan Wi-Fi sekolah untuk membuka materi, mengirim tugas, masuk ke akun pembelajaran, atau berkomunikasi, semuanya melibatkan proses pertukaran data melalui jaringan.</p>
+   <p>Bayangkan sebuah jaringan seperti jalur yang menghubungkan banyak perangkat. Jika jalur tersebut tidak memiliki perlindungan yang memadai, orang yang tidak berkepentingan dapat mencoba masuk, mengamati lalu lintas data, atau menggunakan sumber daya jaringan. Karena itu, keamanan perlu dipikirkan sejak perangkat terhubung sampai data selesai digunakan.</p>
+  </div>
+  <div class="visual"><div class="flow"><div class="node">📄<br><b>Data</b><br><span class="small">Tugas & akun</span></div><div class="arrow">→</div><div class="node">💻<br><b>Perangkat</b><br><span class="small">Laptop & HP</span></div><div class="arrow">→</div><div class="node">🌐<br><b>Jaringan</b><br><span class="small">Wi-Fi / LAN</span></div></div></div>
+  <div class="grid grid-2">
+   <div class="card"><h3>🔐 Data</h3><p class="muted">Perlindungan membantu mengurangi risiko data dibaca, diubah, atau diambil oleh pihak yang tidak memiliki hak.</p></div>
+   <div class="card"><h3>📱 Perangkat</h3><p class="muted">Perangkat yang terhubung perlu dijaga agar tidak mudah dimanfaatkan untuk aktivitas yang tidak diinginkan.</p></div>
+   <div class="card"><h3>👤 Privasi</h3><p class="muted">Informasi seperti akun, identitas, dokumen, dan komunikasi perlu diperlakukan dengan hati-hati.</p></div>
+   <div class="card"><h3>🌐 Konektivitas</h3><p class="muted">Keamanan yang baik membantu menjaga jaringan tetap dapat digunakan sesuai kebutuhan.</p></div>
+  </div>
+  <div class="context-box"><b>Contoh dekat:</b> ketika Wi-Fi rumah digunakan bersama keluarga, password dan perangkat yang terhubung perlu dikelola. Di sekolah, akses siswa, guru, dan admin juga tidak selalu memiliki kebutuhan yang sama.</div>
+ </div>`,
+ question:"Rani memakai Wi-Fi rumah untuk membuka akun belajar dan mengirim tugas. Mengapa keamanan jaringan tetap penting?",
+},
+{
+ id:"m2", title:"10.5.6 • Autentikasi", icon:"🔑",
+ content:`<div class="card">
+  <h2>Autentikasi — memastikan siapa yang meminta akses</h2>
+  <div class="material-detail">
+   <p>Autentikasi adalah proses untuk memverifikasi identitas pengguna atau perangkat sebelum akses diberikan. Sederhananya, sistem ingin memastikan bahwa orang yang meminta masuk memang memiliki bukti yang sesuai. Bukti tersebut dapat berupa password, PIN, kode sekali pakai, atau mekanisme lain yang digunakan oleh sistem.</p>
+   <p>Autentikasi penting karena memiliki password saja tidak cukup jika password tersebut diketahui orang lain. Dengan proses verifikasi, sistem memiliki langkah untuk memeriksa identitas sebelum memberikan akses ke akun atau sumber daya jaringan.</p>
+   <p>Dalam kehidupan siswa, contoh autentikasi dapat ditemukan ketika masuk ke akun pembelajaran menggunakan nama pengguna dan password. Setelah identitas berhasil diverifikasi, barulah pengguna dapat melihat materi atau mengirim tugas sesuai hak aksesnya.</p>
+  </div>
+  <div class="visual"><div class="flow"><div class="node">👤<br><b>Pengguna</b></div><div class="arrow">→</div><div class="node">🔑<br><b>Password / PIN / OTP</b></div><div class="arrow">→</div><div class="node">🛡️<br><b>Verifikasi</b></div><div class="arrow">→</div><div class="node">🌐<br><b>Akses</b></div></div></div>
+  <div class="notice"><b>Intinya:</b> autentikasi menjawab pertanyaan “siapa yang meminta akses?” sebelum sistem memberikan akses.</div>
+ </div>`,
+ question:"Menurutmu, mengapa sebuah sistem perlu melakukan autentikasi sebelum memberikan akses?",
+},
+{
+ id:"m3", title:"10.5.6 • Kata Sandi Kuat", icon:"🔒",
+ content:`<div class="card">
+  <h2>Kata sandi kuat — lapisan perlindungan yang dimulai dari pengguna</h2>
+  <div class="material-detail">
+   <p>Password sering menjadi salah satu pintu pertama menuju akun atau jaringan. Password yang pendek, mudah ditebak, menggunakan informasi pribadi, atau dipakai berulang pada banyak akun membuat satu kebocoran dapat berdampak ke beberapa layanan sekaligus.</p>
+   <p>Password yang lebih kuat umumnya dibuat cukup panjang, unik untuk akun tertentu, dan tidak menggunakan informasi yang mudah ditebak seperti nama, tanggal lahir, nama sekolah, atau kata yang sangat umum. Pengguna juga sebaiknya tidak membagikan password kepada orang lain dan tidak menggunakan contoh password dari materi sebagai password akun nyata.</p>
+   <ul><li>Gunakan password/passphrase yang panjang dan unik.</li><li>Hindari informasi pribadi yang mudah ditebak.</li><li>Jangan menggunakan password yang sama untuk semua akun penting.</li><li>Jangan membagikan password kepada teman hanya karena ingin mempermudah akses.</li></ul>
+  </div>
+  <div class="compare"><div class="bad"><b>❌ Kurang aman</b><div class="code">sekolah123</div><p class="small">Pendek dan berkaitan dengan konteks yang mudah ditebak.</p></div><div class="good"><b>✅ Contoh pola lebih baik</b><div class="code">Buku!Langit#27Kopi</div><p class="small">Lebih panjang dan tidak memakai informasi pribadi yang jelas.</p></div></div>
+  <div class="notice" style="margin-top:16px">💡 Jangan menggunakan contoh password di media ini sebagai password akun nyata. Buat password unik milikmu sendiri.</div>
+ </div>`,
+ question:"Menurutmu, seperti apa kata sandi yang dapat disebut kuat? Jelaskan alasannya.",
+},
+{
+ id:"m4", title:"10.5.6 • Enkripsi", icon:"🔐",
+ content:`<div class="card">
+  <h2>Enkripsi — melindungi isi data saat diproses atau dikirim</h2>
+  <div class="material-detail">
+   <p>Enkripsi adalah proses mengubah data ke bentuk yang tidak mudah dipahami oleh pihak yang tidak memiliki mekanisme atau kunci yang sesuai. Tujuan utamanya adalah membantu menjaga kerahasiaan informasi. Dalam komunikasi digital, enkripsi dapat menjadi salah satu lapisan perlindungan ketika data berpindah melalui jaringan.</p>
+   <p>Misalnya, sebuah pesan dikirim dari satu perangkat ke perangkat lain. Jika data dikirim dalam bentuk yang mudah dibaca tanpa perlindungan yang sesuai, pihak yang tidak berhak berpotensi memperoleh informasi tersebut. Dengan enkripsi, data diproses menjadi bentuk terlindungi sehingga pihak yang tidak memiliki mekanisme yang tepat tidak dapat langsung memahami isinya.</p>
+   <p>Enkripsi bukan berarti jaringan pasti aman dari semua masalah. Enkripsi merupakan salah satu bagian dari keamanan, sehingga tetap perlu didukung oleh autentikasi, password yang baik, pembaruan perangkat, dan pengelolaan akses.</p>
+  </div>
+  <div class="visual"><div class="flow"><div class="node">💬<br><b>“Kirim tugas”</b><br><span class="small">Data asli</span></div><div class="arrow">→ 🔐 →</div><div class="node">#@7X!2...<br><b>Data terlindungi</b><br><span class="small">Bentuk terenkripsi</span></div><div class="arrow">→</div><div class="node">💬<br><b>Data dipahami</b><br><span class="small">Setelah diproses dengan benar</span></div></div></div>
+ </div>`,
+ question:"Jika data jaringan disadap oleh pihak yang tidak berhak, bagaimana enkripsi dapat membantu melindungi data tersebut?",
+},
+{
+ id:"m5", title:"10.5.6 • Pembaruan Perangkat", icon:"🔄",
+ content:`<div class="card">
+  <h2>Pembaruan perangkat — memperbaiki kelemahan yang diketahui</h2>
+  <div class="material-detail">
+   <p>Pembaruan perangkat sering dianggap hanya berkaitan dengan fitur baru atau perubahan tampilan. Padahal, pembaruan sistem operasi, aplikasi, router, dan perangkat jaringan juga dapat membawa perbaikan keamanan. Pengembang dapat menemukan kelemahan pada perangkat lunak lalu menyediakan pembaruan untuk memperbaikinya.</p>
+   <p>Jika perangkat terus menggunakan versi lama dalam waktu yang panjang, kelemahan yang sudah diketahui dapat tetap ada. Karena itu, ketika pembaruan keamanan tersedia, pengguna perlu memperhatikannya dan memasangnya sesuai prosedur yang aman.</p>
+   <p>Di sekolah maupun di rumah, kebiasaan memeriksa pembaruan termasuk tindakan sederhana yang dapat mendukung keamanan. Namun, pengguna tetap perlu memastikan pembaruan berasal dari sumber resmi dan memiliki ruang penyimpanan serta kondisi perangkat yang memadai.</p>
+  </div>
+  <div class="visual"><div class="flow"><div class="node">⚠️<br><b>Kerentanan</b></div><div class="arrow">→</div><div class="node">🔄<br><b>Security Update</b></div><div class="arrow">→</div><div class="node">🛡️<br><b>Perlindungan lebih baik</b></div></div></div>
+ </div>`,
+ question:"Mengapa menurutmu pembaruan perangkat termasuk bagian dari keamanan jaringan?",
+},
+{
+ id:"m6", title:"10.5.6 • Perlindungan Akses", icon:"🚪",
+ content:`<div class="card">
+  <h2>Perlindungan akses — tidak semua pengguna membutuhkan akses yang sama</h2>
+  <div class="material-detail">
+   <p>Dalam sebuah jaringan, banyak pengguna dapat memiliki kebutuhan yang berbeda. Siswa mungkin membutuhkan akses untuk membuka materi dan mengirim tugas, guru membutuhkan akses untuk mengelola pembelajaran, sedangkan admin jaringan membutuhkan akses yang lebih luas untuk mengatur perangkat dan layanan.</p>
+   <p>Karena itu, hak akses sebaiknya diberikan sesuai kebutuhan dan kewenangan. Prinsip ini membantu mengurangi kemungkinan seseorang memperoleh akses yang sebenarnya tidak diperlukan. Semakin luas sebuah akses, semakin besar pula tanggung jawab untuk mengelolanya dengan aman.</p>
+   <p>Perlindungan akses bukan berarti semua pengguna harus dibatasi secara berlebihan. Tujuannya adalah membuat aturan yang jelas: siapa boleh mengakses apa, untuk keperluan apa, dan sejauh mana akses tersebut diperlukan.</p>
+  </div>
+  <div class="visual"><div class="flow"><div class="node">👨‍🎓<br><b>Siswa</b><br><span class="small">Akses belajar</span></div><div class="node">👩‍🏫<br><b>Guru</b><br><span class="small">Akses pengajaran</span></div><div class="node">🧑‍💻<br><b>Admin</b><br><span class="small">Akses pengelolaan</span></div><div class="node">🗄️<br><b>Server</b><br><span class="small">Sumber daya</span></div></div></div>
+ </div>`,
+ question:"Mengapa hak akses siswa dan admin jaringan sebaiknya dibedakan? Berikan contohnya.",
+},
+{
+ id:"m7", title:"10.5.7 • Permasalahan Keamanan Jaringan", icon:"🕵️",
+ content:`<div class="card">
+  <h2>Permasalahan keamanan jaringan — jangan langsung melompat ke solusi</h2>
+  <div class="material-detail">
+   <p>Ketika jaringan mengalami gangguan atau muncul tanda yang mencurigakan, langkah pertama bukan langsung mengganti semua perangkat. Analisis dimulai dengan mengenali masalah yang terlihat, mencari kemungkinan penyebab, memperkirakan dampaknya, lalu menentukan solusi yang sesuai dengan kondisi.</p>
+   <p>Satu gejala juga dapat memiliki lebih dari satu kemungkinan penyebab. Misalnya, jaringan yang lambat dapat berkaitan dengan banyaknya pengguna, perangkat asing, konfigurasi yang kurang tepat, atau masalah lain. Karena itu, siswa perlu menggunakan informasi yang tersedia dan tidak terburu-buru mengambil kesimpulan.</p>
+   <ul><li><b>Masalah:</b> apa yang sedang terjadi?</li><li><b>Penyebab:</b> faktor apa yang mungkin memicunya?</li><li><b>Dampak:</b> apa yang dapat terjadi jika masalah dibiarkan?</li><li><b>Solusi:</b> tindakan apa yang sesuai dan mengapa?</li></ul>
+  </div>
+  <div class="visual"><div class="flow"><div class="node">🔎<br><b>Masalah</b></div><div class="arrow">→</div><div class="node">🔍<br><b>Penyebab</b></div><div class="arrow">→</div><div class="node">💥<br><b>Dampak</b></div><div class="arrow">→</div><div class="node">🛠️<br><b>Solusi</b></div></div></div>
+  <div class="notice">Contoh: password Wi-Fi diketahui terlalu banyak orang → akses tidak dikenal muncul → privasi/kinerja jaringan berisiko → ubah password, batasi akses, dan terapkan pengamanan yang sesuai.</div>
+ </div>`,
+ question:"Jika password Wi-Fi sudah diketahui banyak orang dan muncul perangkat asing, bagaimana kamu akan menganalisis masalah tersebut dari penyebab, dampak, sampai solusinya?",
+},
+{
+ id:"m8", title:"10.5.8 • Keamanan dalam Kehidupan Sehari-hari", icon:"🌐",
+ content:`<div class="card">
+  <h2>Pentingnya keamanan jaringan dalam kehidupan sehari-hari</h2>
+  <div class="material-detail">
+   <p>Keamanan jaringan tidak berhenti di laboratorium komputer. Saat menggunakan Wi-Fi rumah, jaringan sekolah, atau Wi-Fi publik, kita membuat keputusan yang berhubungan dengan keamanan. Kebiasaan sederhana seperti menjaga password, melakukan pembaruan, berhati-hati ketika memasukkan data sensitif, dan memahami jaringan yang digunakan dapat membantu mengurangi risiko.</p>
+   <p>Di rumah, anggota keluarga mungkin berbagi satu jaringan dengan banyak perangkat. Di sekolah, jaringan digunakan untuk pembelajaran dan dapat menghubungkan banyak siswa serta guru. Di tempat umum, pengguna biasanya tidak mengenal siapa yang mengelola jaringan atau siapa saja yang ikut terhubung. Kondisi yang berbeda membuat pengguna perlu menyesuaikan kehati-hatiannya.</p>
+   <p>Intinya, keamanan jaringan adalah bagian dari kebiasaan menggunakan teknologi secara bertanggung jawab. Kita tidak harus menjadi ahli jaringan untuk mulai menerapkannya; memahami prinsip dasarnya sudah membantu kita mengambil keputusan yang lebih aman.</p>
+  </div>
+  <div class="grid grid-3"><div class="card"><div class="icon">🏠</div><h3>Rumah</h3><p class="muted">Amankan Wi-Fi keluarga, perangkat, dan akun yang digunakan bersama.</p></div><div class="card"><div class="icon">🏫</div><h3>Sekolah</h3><p class="muted">Gunakan akses sesuai kebutuhan dan jaga akun pembelajaran.</p></div><div class="card"><div class="icon">☕</div><h3>Tempat umum</h3><p class="muted">Lebih berhati-hati ketika menggunakan jaringan publik dan memasukkan data sensitif.</p></div></div>
+ </div>`,
+ question:"Saat menggunakan Wi-Fi publik, kebiasaan keamanan apa yang sebaiknya kamu lakukan? Jelaskan alasannya.",
+}
+];
+
+const USER_STORE_KEY="netguardUsers";
+const CURRENT_USER_KEY="netguardCurrentUser";
+const STUDENT_ID_KEY="netguardStudentId";
+// Tempel URL Web App Google Apps Script di antara tanda kutip di bawah ini.
+const API_URL="https://script.google.com/macros/s/AKfycbxhzbC_-kj2fQ9OIyYh3sK4RI_SgEbuFz32dBRO4pdLP4P57C7ZWNJgqNxr9aPbSwtw/exec";
+const SESSION_ID=new Date().toISOString().slice(0,10);
+let studentId=localStorage.getItem(STUDENT_ID_KEY)||(function(){try{return "NG-"+(crypto.randomUUID?crypto.randomUUID().slice(0,8):Math.random().toString(36).slice(2,10));}catch(e){return "NG-"+Math.random().toString(36).slice(2,10);}})();
+localStorage.setItem(STUDENT_ID_KEY,studentId);
+let onlineMembers=[]; let onlineIndividuals=[]; let onlineGroupFinal=null; let apiReady=false;
+let users = JSON.parse(localStorage.getItem(USER_STORE_KEY) || "{}");
+let currentUser = localStorage.getItem(CURRENT_USER_KEY) || "";
+let state = getUserState();
+let currentMaterial = 0;
+
+function blankState(name=""){
+  return {name,group:"",missions:{},individual:null,groupFinal:null,reflection:null};
+}
+function getUserState(){
+  if(!currentUser) return blankState();
+  return users[currentUser] || blankState(currentUser);
+}
+async function apiGet(action, params={}){
+  if(!API_URL || API_URL.includes("PASTE_APPS_SCRIPT")) return {success:false,offline:true,error:"API_URL belum diatur."};
+  const q=new URLSearchParams({action,session:SESSION_ID,...params});
+  try{ const r=await fetch(API_URL+"?"+q.toString(),{cache:"no-store"}); return await r.json(); }
+  catch(e){ return {success:false,error:e.message||"Gagal terhubung ke server."}; }
+}
+async function syncRegister(){
+  if(!state.name||!state.group) return;
+  const r=await apiGet("register",{group:state.group,name:state.name,studentId});
+  if(r.success){apiReady=true;onlineMembers=Array.isArray(r.members)?r.members:[];renderOnlineStatus();renderMembersList();renderBoard(false);}
+  else renderOnlineStatus(r.error||"Belum terhubung");
+}
+async function refreshGroupData(showAlert=false){
+  if(!state.group) return false;
+  const r=await apiGet("groupData",{group:state.group});
+  if(r.success){
+    apiReady=true;
+    onlineMembers=Array.isArray(r.members)?r.members:[];
+    onlineIndividuals=Array.isArray(r.individuals)?r.individuals:[];
+    onlineGroupFinal=r.groupFinal||null;
+    renderOnlineStatus();
+    renderMembersList();
+    return true;
+  }
+  apiReady=false;
+  renderOnlineStatus(r.error||"Belum terhubung");
+  if(showAlert) alert("Belum bisa mengambil data kelompok dari Google Sheets. Pastikan URL Apps Script sudah dipasang dan deployment dapat diakses.");
+  return false;
+}
+function renderOnlineStatus(msg=""){
+  const el=document.getElementById("onlineStatus"); if(!el) return;
+  if(apiReady) el.innerHTML=`🟢 <b>Kelompok tersinkron</b> • ${onlineMembers.length} anggota tercatat • ${onlineIndividuals.length} pendapat terkumpul`;
+  else el.innerHTML=`🟠 <b>Belum tersinkron</b>${msg?` • ${escapeHTML(msg)}`:""}`;
+}
+function renderMembersList(){
+  const el=document.getElementById("onlineMembersList"); if(!el) return;
+  if(!onlineMembers.length){el.innerHTML='<span class="muted">Belum ada anggota lain yang tercatat.</span>';return;}
+  el.innerHTML=onlineMembers.map(m=>`<span class="member-chip">🟢 ${escapeHTML(m.name)}</span>`).join(" ");
+}
+function persist(){
+  if(currentUser){
+    users[currentUser]=state;
+    localStorage.setItem(USER_STORE_KEY,JSON.stringify(users));
+    localStorage.setItem(CURRENT_USER_KEY,currentUser);
+  }
+  updateDashboard(); updateProgress();
+}
+function normalizeName(name){return name.trim().toLowerCase().replace(/\s+/g," ")}
+function openIdentity(){
+  const name=prompt("Masukkan nama siswa:", state.name || "");
+  if(name===null) return;
+  const clean=name.trim();
+  if(!clean){alert("Nama tidak boleh kosong.");return;}
+  switchUser(clean);
+}
+function switchUser(name){
+  currentUser=normalizeName(name);
+  state=users[currentUser] || blankState(name.trim());
+  state.name=state.name || name.trim();
+  localStorage.setItem(CURRENT_USER_KEY,currentUser);
+  users[currentUser]=state;
+  localStorage.setItem(USER_STORE_KEY,JSON.stringify(users));
+  updateDashboard(); updateProgress(); renderMaterials(); renderLKPD(); renderReflection();
+  if(state.group) syncRegister();
+}
+function changeUser(){
+  const oldName=state.name;
+  const name=prompt(`Ganti pengguna${oldName?` dari ${oldName}`:""}. Masukkan nama siswa berikutnya:` , "");
+  if(name===null) return;
+  const clean=name.trim();
+  if(!clean){alert("Nama tidak boleh kosong.");return;}
+  switchUser(clean);
+  alert(`Sekarang aktif sebagai ${state.name}. Progres pengguna sebelumnya tetap tersimpan.`);
+}
+function restartFromBeginning(){
+  const ok=confirm("Ulangi dari awal? Identitas aktif akan dilepas dan kamu akan kembali ke halaman pembuka. Progres pengguna yang sudah tersimpan tetap aman.");
+  if(!ok) return;
+  currentUser="";
+  state=blankState();
+  onlineMembers=[];
+  onlineIndividuals=[];
+  onlineGroupFinal=null;
+  apiReady=false;
+  localStorage.removeItem(CURRENT_USER_KEY);
+  updateDashboard();
+  updateProgress();
+  go("splash");
+}
+function go(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(id==="home") updateDashboard();
+  if(id==="materi") renderMaterials();
+  if(id==="lkpd") renderLKPD();
+  if(id==="refleksi") renderReflection();
+  updateProgress();
+}
+function updateDashboard(){
+  document.getElementById("homeName").textContent=state.name || "Penjaga Jaringan";
+  const done=Object.keys(state.missions||{}).length;
+  document.getElementById("missionCount").textContent=`${done}/8`;
+  document.getElementById("activityScore").textContent=Math.round(done/8*100)+"%";
+  document.getElementById("lkpdStatus").textContent=state.lkpd?.saved?"Selesai":state.lkpd?.group?"Proses":"Belum";
+  document.getElementById("reflectionStatus").textContent=state.reflection?"Selesai":"Belum";
+  const active=document.getElementById("activeIdentity"), hint=document.getElementById("activeIdentityHint"), action=document.getElementById("identityAction");
+  if(state.name){
+    active.textContent=state.name;
+    hint.textContent=state.group?`Kelompok ${state.group} • progres tersimpan khusus untuk pengguna ini.`:"Identitas aktif • progres akan tersimpan khusus untuk pengguna ini.";
+    action.textContent="Ganti Pengguna";
+    action.onclick=changeUser;
+  }else{
+    active.textContent="Belum masuk";
+    hint.textContent="Masukkan nama sebelum aktivitas agar progres tersimpan atas nama kamu.";
+    action.textContent="Masukkan Identitas";
+    action.onclick=openIdentity;
+  }
+}
+function updateProgress(){
+  const mission=Object.keys(state.missions||{}).length/8;
+  const lkpd=state.lkpd?.saved?1:state.lkpd?.group?0.5:0;
+  const refl=state.reflection?1:0;
+  const pct=Math.round((mission*.7+lkpd*.2+refl*.1)*100);
+  document.getElementById("globalProgress").style.width=pct+"%";
+  document.getElementById("progressLabel").textContent=pct+"%";
+}
+function renderMaterials(){
+  const nav=document.getElementById("materialNav");
+  const container=document.getElementById("materialsContainer");
+  if(!nav||!container)return;
+
+  if(!materials.length){
+    nav.innerHTML="";
+    container.innerHTML='<div class="card"><p class="muted">Materi belum tersedia.</p></div>';
+    return;
+  }
+
+  if(currentMaterial<0||currentMaterial>=materials.length) currentMaterial=0;
+
+  nav.innerHTML=materials.map((m,i)=>`
+    <button type="button" class="pill ${i===currentMaterial?'active':''}" onclick="showMaterial(${i})">
+      ${m.icon} ${escapeHTML(m.title)}
+    </button>`).join("");
+
+  container.innerHTML=materials.map((m,i)=>`
+    <article class="material ${i===currentMaterial?'active':''}" id="material-${m.id}">
+      ${m.content}
+      <div class="mission-box">
+        <div class="eyebrow">MISSION CHECK ${i+1}</div>
+        <h3 style="margin-top:7px">💬 Cek pemahaman melalui diskusi</h3>
+        <p class="muted" style="margin-top:8px">${escapeHTML(m.question)}</p>
+        <div class="material-actions">
+          <span class="small">${state.missions?.[m.id] ? '✅ Sudah dibahas' : '🗣️ Bahas bersama guru/teman'}</span>
+          <button type="button" class="btn ${state.missions?.[m.id]?'secondary':'success'}" onclick="markMission(${i})" ${state.missions?.[m.id]?'disabled':''}>
+            ${state.missions?.[m.id]?'Sudah Dibahas':'Tandai Sudah Dibahas'}
+          </button>
+        </div>
+      </div>
+      <div class="material-actions">
+        <button type="button" class="btn secondary" onclick="showMaterial(${Math.max(0,i-1)})" ${i===0?'disabled':''}>← Sebelumnya</button>
+        <span class="small" style="align-self:center">Bagian ${i+1} dari ${materials.length}</span>
+        <button type="button" class="btn secondary" onclick="showMaterial(${Math.min(materials.length-1,i+1)})" ${i===materials.length-1?'disabled':''}>Berikutnya →</button>
+      </div>
+    </article>`).join("");
+}
+
+function showMaterial(i){
+  if(i<0||i>=materials.length)return;
+  currentMaterial=i;
+  renderMaterials();
+  const el=document.getElementById(`material-${materials[i].id}`);
+  if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function markMission(i){
+  if(!state.name){
+    alert("Masukkan identitas terlebih dahulu agar aktivitas tersimpan atas nama kamu.");
+    go("home"); return;
+  }
+  const m=materials[i];
+  if(state.missions[m.id]) return;
+  state.missions[m.id]={discussed:true,time:new Date().toISOString()};
+  persist(); renderMaterials();
+}
+const lkpdCases = [
+  {
+    id:"KEL1", title:"Wi-Fi Laboratorium Mulai Bermasalah", context:"Sekolah • Laboratorium Informatika • Wi-Fi bersama",
+    text:`<p>Senin pagi, kelas X menggunakan Wi-Fi laboratorium untuk membuka media pembelajaran dan mengirim tugas. Setelah banyak perangkat terhubung, beberapa siswa mengalami koneksi lambat meskipun sinyal terlihat penuh.</p><p>Guru memeriksa router dan menemukan beberapa perangkat yang tidak dikenal. Seorang siswa mengaku pernah memberikan password Wi-Fi kepada teman dari kelas lain. Password tersebut juga sudah berbulan-bulan tidak diganti dan cukup sederhana sehingga mudah diingat.</p><p>Guru belum dapat memastikan perangkat asing melakukan tindakan berbahaya. Namun, jumlah perangkat yang tidak dikenal membuat jaringan lebih sulit dikendalikan dan dapat memengaruhi keamanan serta kualitas koneksi.</p>`,
+    focus:"Fokus analisis: password kuat, autentikasi, pembatasan akses, dan pengelolaan perangkat yang terhubung."
+  },
+  {
+    id:"KEL2", title:"Wi-Fi Keluarga yang Dipakai Bersama", context:"Rumah • Keluarga • Wi-Fi pribadi",
+    text:`<p>Di sebuah rumah, Wi-Fi digunakan oleh orang tua, anak, dan beberapa kerabat yang sering berkunjung. Karena ingin praktis, password Wi-Fi ditempel di dekat meja ruang tamu agar siapa pun yang datang dapat langsung terhubung.</p><p>Beberapa bulan kemudian, keluarga mulai menerima pesan promosi yang tidak diinginkan dan menemukan perangkat asing masih terhubung ketika melihat daftar perangkat pada router. Tidak ada anggota keluarga yang ingat kapan terakhir password diganti.</p><p>Keluarga ingin tetap bisa berbagi internet dengan tamu tanpa membuat jaringan utama mereka terlalu terbuka.</p>`,
+    focus:"Fokus analisis: perlindungan akses, password, jaringan tamu, dan kebiasaan berbagi akses dalam keluarga."
+  },
+  {
+    id:"KEL3", title:"Internet Bersama di Balai Warga", context:"Lingkungan sekitar • Balai warga • Wi-Fi publik terbatas",
+    text:`<p>Balai warga menyediakan Wi-Fi yang dapat digunakan warga untuk belajar, mencari informasi, dan mengurus kebutuhan administrasi secara daring. Password awalnya hanya diberikan kepada pengurus dan warga yang membutuhkan.</p><p>Lama-kelamaan password tersebar melalui grup percakapan sehingga banyak orang dari luar lingkungan ikut menggunakan jaringan. Saat kegiatan warga berlangsung, koneksi menjadi sangat lambat. Pengurus juga tidak mengetahui perangkat mana saja yang sebenarnya sedang terhubung.</p><p>Pengurus ingin tetap mempertahankan semangat berbagi fasilitas, tetapi juga perlu menjaga jaringan agar aman dan dapat digunakan sesuai kebutuhan warga.</p>`,
+    focus:"Fokus CRT: bagaimana menjaga nilai kebersamaan dan berbagi fasilitas sambil tetap menerapkan perlindungan akses jaringan."
+  },
+  {
+    id:"KEL4", title:"Komputer Perpustakaan Dipakai Bergantian", context:"Sekolah • Perpustakaan • Komputer bersama",
+    text:`<p>Perpustakaan sekolah memiliki beberapa komputer yang dapat digunakan siswa untuk mencari referensi dan mengakses akun pembelajaran. Karena komputer dipakai bergantian, beberapa siswa memilih menyimpan password akun di browser agar tidak perlu mengetiknya lagi.</p><p>Suatu hari seorang siswa dapat membuka akun pembelajaran yang masih tersimpan pada komputer tersebut. Ia tidak berniat melakukan tindakan buruk, tetapi kejadian itu menunjukkan bahwa akun pengguna sebelumnya belum terlindungi dengan baik.</p><p>Petugas perpustakaan ingin membuat aturan yang tetap praktis bagi siswa, tetapi tidak mengorbankan privasi dan keamanan akun.</p>`,
+    focus:"Fokus analisis: autentikasi, logout, perlindungan akun, dan kebiasaan aman saat menggunakan perangkat bersama."
+  },
+  {
+    id:"KEL5", title:"Persiapan Bazar Kelas dan QR Pembayaran", context:"Sekolah • Bazar kelas • Perangkat dan jaringan",
+    text:`<p>Saat bazar kelas, beberapa siswa menggunakan satu ponsel dan laptop untuk mencatat pesanan serta memeriksa pembayaran digital. Perangkat tersebut terhubung ke hotspot yang password-nya dibagikan kepada banyak panitia agar semua dapat membantu.</p><p>Karena perangkat digunakan bergantian, beberapa aplikasi dan sistem operasi belum diperbarui. Salah satu panitia juga mengunduh aplikasi tambahan dari sumber yang tidak jelas untuk membantu mencatat transaksi.</p><p>Guru meminta kelompok memikirkan bagaimana kegiatan tetap berjalan cepat dan nyaman tanpa mengabaikan keamanan perangkat dan data transaksi.</p>`,
+    focus:"Fokus analisis: pembaruan perangkat, perlindungan akses, kehati-hatian terhadap aplikasi, dan keamanan data kegiatan."
+  },
+  {
+    id:"KEL6", title:"Wi-Fi di Ruang Multimedia Saat Acara Sekolah", context:"Sekolah • Acara bersama • Jaringan nirkabel",
+    text:`<p>Saat sebuah acara sekolah, ruang multimedia menyediakan Wi-Fi untuk panitia. Karena banyak perangkat perlu terhubung, password dibagikan melalui pesan ke beberapa kelompok sekaligus.</p><p>Di tengah acara, koneksi menjadi tidak stabil. Panitia menemukan perangkat yang tidak dikenal dan beberapa laptop menggunakan sistem operasi yang belum lama diperbarui. Karena semua perangkat menggunakan jaringan yang sama, panitia kesulitan menentukan perangkat mana yang membutuhkan perhatian.</p><p>Acara tetap harus berjalan. Kelompok diminta menyusun solusi yang dapat dilakukan tanpa menghentikan seluruh kegiatan.</p>`,
+    focus:"Fokus analisis: pemisahan akses, perangkat yang aman, pembaruan sistem, dan pengelolaan jaringan saat banyak pengguna."
+  },
+  {
+    id:"KEL7", title:"Hotspot untuk Belajar di Warung Dekat Sekolah", context:"Lingkungan sekitar sekolah • Tempat usaha • Hotspot",
+    text:`<p>Sekelompok siswa sering belajar bersama di sebuah warung yang menyediakan Wi-Fi untuk pelanggan. Password diberikan kepada pelanggan melalui tulisan di meja agar mudah digunakan.</p><p>Beberapa siswa menggunakan Wi-Fi tersebut untuk membuka akun belajar dan mengirim dokumen. Mereka kemudian mengetahui bahwa orang yang duduk di tempat lain juga menggunakan jaringan yang sama. Tidak semua siswa memahami kapan sebaiknya menghindari memasukkan informasi sensitif saat menggunakan Wi-Fi bersama.</p><p>Pemilik warung ingin memberikan layanan yang nyaman, sementara siswa perlu memahami kebiasaan aman ketika berada pada jaringan yang tidak sepenuhnya mereka kendalikan.</p>`,
+    focus:"Fokus CRT: kebiasaan penggunaan internet di tempat yang dekat dengan kehidupan siswa dan cara menjaga privasi pada jaringan bersama."
+  },
+  {
+    id:"KEL8", title:"Kegiatan Karang Taruna dan Hotspot Bersama", context:"Lingkungan masyarakat • Karang taruna • Kegiatan bersama",
+    text:`<p>Dalam sebuah kegiatan karang taruna, panitia membuat hotspot sementara agar anggota dapat mengirim dokumentasi dan mengakses informasi kegiatan. Karena ingin semua anggota mudah terhubung, password yang sama digunakan sepanjang kegiatan.</p><p>Setelah acara selesai, hotspot masih aktif karena perangkat belum dimatikan. Beberapa anggota tidak menyadari bahwa jaringan tersebut masih dapat ditemukan dari sekitar lokasi.</p><p>Panitia ingin membuat kebiasaan sederhana agar penggunaan jaringan saat kegiatan bersama tetap aman tanpa membuat proses teknis menjadi rumit.</p>`,
+    focus:"Fokus CRT: kebiasaan keamanan dalam kegiatan gotong royong dan tanggung jawab bersama terhadap fasilitas digital."
+  },
+  {
+    id:"KEL9", title:"Laptop Keluarga untuk Belajar dan Bekerja", context:"Rumah • Perangkat bersama • Akun keluarga",
+    text:`<p>Satu laptop digunakan bersama oleh beberapa anggota keluarga untuk belajar, bekerja, dan mengakses berbagai layanan internet. Agar praktis, semua orang menggunakan satu akun pengguna pada laptop tersebut.</p><p>Suatu ketika, file tugas sekolah tercampur dengan dokumen pekerjaan orang tua. Salah satu anggota keluarga juga tidak sengaja mengubah pengaturan jaringan ketika mencoba memperbaiki koneksi.</p><p>Keluarga menyadari bahwa penggunaan satu perangkat bersama membutuhkan aturan agar setiap orang dapat bekerja tanpa mengganggu data dan pengaturan pengguna lain.</p>`,
+    focus:"Fokus analisis: autentikasi pengguna, hak akses, pemisahan akun, dan perlindungan data pada perangkat bersama."
+  },
+  {
+    id:"KEL10", title:"Wi-Fi Kelas dan Teman dari Kelas Lain", context:"Sekolah • Kelas • Akses jaringan",
+    text:`<p>Sebuah kelas memiliki akses Wi-Fi untuk kegiatan pembelajaran. Seorang siswa memberikan password kepada teman dari kelas lain karena temannya sedang membutuhkan internet untuk mengirim tugas.</p><p>Awalnya tidak ada masalah. Namun beberapa hari kemudian guru melihat banyak perangkat baru dan koneksi menjadi lebih lambat. Siswa berpendapat bahwa berbagi password adalah bentuk saling membantu, sedangkan guru menjelaskan bahwa akses jaringan juga perlu dikelola agar tetap aman dan adil.</p><p>Kelompok diminta mencari cara agar kebutuhan saling membantu tetap dapat dilakukan tanpa membuat akses jaringan kehilangan kendali.</p>`,
+    focus:"Fokus CRT: menyeimbangkan nilai saling membantu dengan tanggung jawab menjaga akses jaringan dan fasilitas bersama."
+  },
+  {
+    id:"KEL11", title:"Jaringan Toko Kecil dan Komputer Kasir", context:"Lingkungan sekitar • Usaha kecil • Jaringan kabel dan nirkabel",
+    text:`<p>Sebuah usaha kecil menggunakan komputer kasir yang terhubung ke jaringan bersama dengan ponsel pemilik dan perangkat untuk memantau stok. Karena ingin sederhana, semua perangkat memakai jaringan yang sama dan password Wi-Fi hanya diketahui pemilik serta beberapa pegawai.</p><p>Salah satu pegawai sering memasang perangkat pribadi ke jaringan tersebut. Komputer kasir juga jarang diperbarui karena pemilik khawatir pembaruan akan mengganggu kegiatan jual beli.</p><p>Pemilik ingin menjaga data transaksi dan perangkat tetap aman tanpa membuat kegiatan usaha sehari-hari menjadi sulit.</p>`,
+    focus:"Fokus analisis: pembaruan perangkat, perlindungan akses, pemisahan perangkat, dan keamanan data dalam kegiatan ekonomi sehari-hari."
+  }
+];
+
+function saveIdentity(){
+  const group=(document.getElementById("groupCode")?.value||"").trim().toUpperCase();
+  const operator=(document.getElementById("studentName")?.value||"").trim();
+  const members=[1,2,3,4].map(i=>(document.getElementById("member"+i)?.value||"").trim());
+  if(!group){alert("Pilih nomor kelompok terlebih dahulu.");return;}
+  if(members.some(v=>!v)){alert("Lengkapi nama 4 anggota kelompok terlebih dahulu.");return;}
+
+  // Pengisi/pengetik boleh salah satu dari 4 anggota. Jika dikosongkan, gunakan anggota pertama.
+  const typer=operator || members[0];
+  const caseData=lkpdCases.find(x=>x.id===group);
+  if(!caseData){alert("Kasus kelompok belum ditemukan.");return;}
+
+  // LKPD baru sepenuhnya lokal: satu perangkat mengerjakan satu LKPD kelompok.
+  // Tidak ada sinkronisasi antar-HP dan tidak ada ketergantungan Google Sheets.
+  state.name=typer;
+  state.group=group;
+  state.lkpd={
+    group,
+    operator:typer,
+    members,
+    caseId:caseData.id,
+    answers:state.lkpd?.group===group ? (state.lkpd.answers||{}) : {},
+    saved:state.lkpd?.group===group ? !!state.lkpd.saved : false,
+    submitted:state.lkpd?.group===group ? (state.lkpd.submitted||null) : null
+  };
+  state.groupFinal=state.lkpd.saved?{group,...state.lkpd.answers}:null;
+  persist();
+  renderLKPD();
+  // Pastikan pengguna langsung melihat bagian kasus tanpa bergantung pada API.
+  document.getElementById("caseCard")?.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function renderLKPD(){
+  const identity=document.getElementById("identityCard");
+  const caseCard=document.getElementById("caseCard");
+  const analysis=document.getElementById("analysisCard");
+  const summary=document.getElementById("summaryCard");
+  if(!identity||!caseCard||!analysis||!summary)return;
+
+  if(!state.lkpd || !state.group){
+    identity.style.display="block";
+    caseCard.style.display="none";
+    analysis.style.display="none";
+    summary.style.display="none";
+    return;
+  }
+
+  identity.style.display="block";
+  caseCard.style.display="block";
+  analysis.style.display="block";
+
+  const c=lkpdCases.find(x=>x.id===state.lkpd.caseId) || lkpdCases.find(x=>x.id===state.group) || lkpdCases[0];
+  document.getElementById("caseLabel").textContent=`${c.id.replace("KEL", "Kasus ")} • PBL + CRT`;
+  document.getElementById("caseTitle").textContent=c.title;
+  document.getElementById("caseMeta").innerHTML=`<span>📍 ${escapeHTML(c.context)}</span><span>🛡️ Keamanan jaringan</span><span>👥 4 anggota</span>`;
+  document.getElementById("caseText").innerHTML=c.text;
+  document.getElementById("caseFocus").innerHTML=`<b>🎯 Arah investigasi:</b> ${escapeHTML(c.focus)}`;
+
+  document.getElementById("groupCode").value=state.group||"";
+  document.getElementById("studentName").value=state.lkpd.operator||state.name||"";
+  (state.lkpd.members||[]).forEach((m,i)=>{
+    const el=document.getElementById("member"+(i+1));
+    if(el)el.value=m||"";
+  });
+
+  const a=state.lkpd.answers||{};
+  const map={
+    gProblem:"problem",gCause:"cause",gImpact:"impact",gSolution:"solution",
+    gConcept:"concept",gCRT:"crt",gReason:"reason",gConclusion:"conclusion"
+  };
+  Object.entries(map).forEach(([id,key])=>{
+    const el=document.getElementById(id); if(el)el.value=a[key]||"";
+  });
+
+  const saved=!!state.lkpd.saved;
+  document.getElementById("groupSaved").style.display=saved?"block":"none";
+  document.getElementById("summaryCard").style.display=saved?"block":"none";
+  document.getElementById("pdfBtn").disabled=!saved;
+}
+
+function saveGroupLKPD(){
+  if(!state.lkpd||!state.group){alert("Identitas kelompok belum lengkap.");return;}
+  const ids=["gProblem","gCause","gImpact","gSolution","gConcept","gCRT","gReason","gConclusion"];
+  const vals=ids.map(id=>document.getElementById(id)?.value.trim()||"");
+  if(vals.some(v=>!v)){
+    alert("Lengkapi semua bagian analisis kelompok terlebih dahulu.");
+    return;
+  }
+  state.lkpd.answers={
+    problem:vals[0],cause:vals[1],impact:vals[2],solution:vals[3],
+    concept:vals[4],crt:vals[5],reason:vals[6],conclusion:vals[7]
+  };
+  state.lkpd.saved=true;
+  state.lkpd.submitted=new Date().toISOString();
+  state.groupFinal={group:state.group,...state.lkpd.answers,submitted:state.lkpd.submitted};
+  persist();
+  renderLKPD();
+  document.getElementById("summaryCard")?.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+async function generateLKPDF(){
+  if(!state.lkpd?.saved){alert("Simpan LKPD kelompok terlebih dahulu.");return;}
+  if(!window.jspdf || !window.jspdf.jsPDF){alert("Fitur PDF membutuhkan koneksi internet saat tombol PDF digunakan.");return;}
+  const c=lkpdCases.find(x=>x.id===state.lkpd.caseId)||lkpdCases.find(x=>x.id===state.group)||lkpdCases[0];
+  const a=state.lkpd.answers||{};
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:"mm",format:"a4"});
+  const margin=18,maxW=174; let y=18,lineH=5.5;
+  const safe=v=>String(v??"").replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/gu,"").replace(/\s+/g," ").trim();
+  const ensure=need=>{if(y+need>280){doc.addPage();y=18;}};
+  const title=(txt,size=15)=>{ensure(12);doc.setFont("helvetica","bold");doc.setFontSize(size);doc.text(safe(txt),margin,y);y+=size>=15?9:7;};
+  const text=(txt,bold=false)=>{doc.setFont("helvetica",bold?"bold":"normal");doc.setFontSize(10);const lines=doc.splitTextToSize(safe(txt),maxW);ensure(lines.length*lineH+4);doc.text(lines,margin,y);y+=lines.length*lineH+3;};
+  const section=txt=>{ensure(12);doc.setDrawColor(180,190,200);doc.line(margin,y,192,y);y+=6;title(txt,12);};
+
+  title("NETGUARD — LKPD ANALISIS KEAMANAN JARINGAN",15);
+  text("LKPD Kelompok • PBL + Culturally Responsive Teaching",true);
+  text(`Kelompok: ${state.group}`);
+  text(`Anggota: ${(state.lkpd.members||[]).join("; ")}`);
+  text(`Pengisi/pengetik: ${state.lkpd.operator||"-"}`);
+  text(`Tanggal: ${new Date().toLocaleDateString("id-ID")}`);
+
+  section("A. KASUS KELOMPOK");
+  text(c.title,true);
+  text(`Konteks: ${c.context}`);
+  text(c.text.replace(/<[^>]+>/g," "));
+
+  section("B. HASIL ANALISIS KELOMPOK");
+  text("1. Masalah keamanan jaringan",true); text(a.problem);
+  text("2. Penyebab",true); text(a.cause);
+  text("3. Dampak",true); text(a.impact);
+  text("4. Solusi keamanan jaringan",true); text(a.solution);
+  text("5. Konsep keamanan jaringan yang digunakan",true); text(a.concept);
+
+  section("C. KAITAN DENGAN KEHIDUPAN (CRT)");
+  text(a.crt);
+  text("Alasan solusi sesuai dengan kondisi kasus",true); text(a.reason);
+
+  section("D. KESIMPULAN KELOMPOK");
+  text(a.conclusion);
+
+  section("E. PERNYATAAN HASIL DISKUSI");
+  text("LKPD ini merupakan hasil pembahasan bersama empat anggota kelompok. Satu anggota bertugas mengetik jawaban yang telah disepakati kelompok.");
+  doc.save(`NETGUARD_LKPD_${state.group}.pdf`);
+}
+
+function activateShield(el){
+  if(!el) return;
+  el.classList.remove("scan"); void el.offsetWidth; el.classList.add("scan");
+  setTimeout(()=>el.classList.remove("scan"),950);
+}
+
+document.querySelectorAll('.shield').forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activateShield(el)}}));
+
+function saveReflection(){
+  const vals={before:document.getElementById("rBefore").value.trim(),after:document.getElementById("rAfter").value.trim(),action:document.getElementById("rAction").value.trim(),context:document.getElementById("rContext").value};
+  if(!vals.before||!vals.after||!vals.action||!vals.context){alert("Lengkapi refleksi terlebih dahulu.");return}
+  state.reflection=vals;persist();document.getElementById("reflectionSaved").style.display="block";
+}
+function renderReflection(){
+  if(!state.reflection)return;
+  document.getElementById("rBefore").value=state.reflection.before||"";
+  document.getElementById("rAfter").value=state.reflection.after||"";
+  document.getElementById("rAction").value=state.reflection.action||"";
+  document.getElementById("rContext").value=state.reflection.context||"";
+}
+function escapeHTML(str){
+  return String(str).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+(function migrateLegacy(){
+  if(!currentUser && Object.keys(users).length===0){
+    try{
+      const legacy=JSON.parse(localStorage.getItem("netguardState")||"null");
+      if(legacy && legacy.name){
+        currentUser=normalizeName(legacy.name); state=legacy; users[currentUser]=state;
+        localStorage.setItem(USER_STORE_KEY,JSON.stringify(users)); localStorage.setItem(CURRENT_USER_KEY,currentUser);
+      }
+    }catch(e){}
+  }
+})();
+
+updateDashboard();updateProgress();
+</script>
+</body>
+</html>
